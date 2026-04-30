@@ -1,0 +1,291 @@
+# API Documentation
+
+Selected API Endpoint: Python Flask – User Registration Endpoint
+
+I am choosing the Python Flask User Registration Endpoint:
+
+POST /api/users/register
+
+I chose this endpoint because it contains several important backend concepts such as:
+
+request validation
+
+
+checking for duplicate users
+
+
+email validation
+
+
+password validation
+
+
+password hashing
+
+
+database storage
+
+
+confirmation email sending
+
+
+error handling
+
+
+This makes it a good example for API documentation because it includes both business logic and security practices.
+
+Original API Endpoint Code:
+
+@app.route('/api/users/register', methods=['POST'])
+def register_user():
+"""Register a new user"""
+data = request.get_json()
+
+required_fields = ['username', 'email', 'password']
+for field in required_fields:
+if field not in data:
+return jsonify({
+'error': 'Missing required field',
+'message': f'{field} is required'
+}), 400
+
+if User.query.filter_by(username=data['username']).first():
+return jsonify({
+'error': 'Username taken',
+'message': 'Username is already in use'
+}), 409
+
+if User.query.filter_by(email=data['email']).first():
+return jsonify({
+'error': 'Email exists',
+'message': 'An account with this email already exists'
+}), 409
+
+if not re.match(r"^[^@]+@[^@]+\.[^@]+$", data['email']):
+return jsonify({
+'error': 'Invalid email',
+'message': 'Please provide a valid email address'
+}), 400
+
+if len(data['password']) < 8:
+return jsonify({
+'error': 'Weak password',
+'message': 'Password must be at least 8 characters long'
+}), 400
+
+
+
+**Prompt 1 Used**
+
+Endpoint Documentation Generation Prompt
+
+Please create comprehensive documentation for this API endpoint:
+
+Endpoint: POST /api/users/register
+Implementation code:
+[pasted endpoint code]
+Please include:
+
+
+-A clear description of the endpoint’s purpose
+
+
+-Request parameters with types and descriptions
+
+
+-Response format with status codes and examples
+
+
+-Authentication requirements
+
+
+-Potential error responses
+
+
+-At least 2 example requests with responses
+
+
+-Any special considerations
+
+
+
+**AI Response from Prompt 1**
+
+User Registration API Documentation
+
+Endpoint
+POST /api/users/register
+
+Purpose
+
+This endpoint is used to register a new user account in the system.
+
+It validates user input, checks if the username or email already exists, hashes the password securely, stores the new user in the database, and sends a confirmation email.
+
+Authentication
+No authentication is required because this endpoint is used before the user logs in.
+
+Request Body
+
+JSON Format
+{  "username": "john_doe",  "email": "john@example.com",  "password": "strongpassword123"}
+
+Request Parameters
+
+FieldTypeRequiredDescriptionusernameStringYesUnique username for the new accountemailStringYesValid email addresspasswordStringYesPassword with minimum 8 characters
+
+Success Response
+
+Status Code
+201 Created
+
+Response Example
+{  "message": "User registered successfully",  "user": {    "id": 1,    "username": "john_doe",    "email": "john@example.com",    "created_at": "2026-04-29T10:30:00",    "role": "user"  }}
+
+Error Responses
+
+
+400 Bad Request
+
+Missing required field:
+{  "error": "Missing required field",  "message": "email is required"}
+Invalid email:
+{  "error": "Invalid email",  "message": "Please provide a valid email address"}
+Weak password:
+{  "error": "Weak password",  "message": "Password must be at least 8 characters long"}
+
+
+409 Conflict
+
+Username already exists:
+{  "error": "Username taken",  "message": "Username is already in use"}
+Email already exists:
+{  "error": "Email exists",  "message": "An account with this email already exists"}
+
+
+500 Internal Server Error
+{  "error": "Server error",  "message": "Failed to register user"}
+
+
+**Prompt 2 Used**
+
+API Reference Conversion Prompt
+Please convert this API information into a structured OpenAPI document.
+API details:
+[pasted endpoint documentation]
+Include:
+
+
+-Endpoint definitions
+
+
+-Request body schema
+
+
+-Response schemas
+
+
+-Example requests and responses
+
+
+-Error handling
+
+
+-Format the output as a valid OpenAPI document.
+
+**AI Response from Prompt 2**
+
+OpenAPI Format
+openapi: 3.0.0info:  title: User Registration API  version: 1.0.0  description: API for registering new userspaths:  /api/users/register:    post:      summary: Register new user      description: Creates a new user account      requestBody:        required: true        content:          application/json:            schema:              type: object              required:                - username                - email                - password              properties:                username:                  type: string                email:                  type: string                password:                  type: string                  minLength: 8      responses:        '201':          description: User registered successfully        '400':          description: Validation error        '409':          description: Duplicate username or email        '500':          description: Server error
+
+
+**Prompt 3 Used**
+
+API Usage Guide Creation Prompt
+Please create a developer guide for using this API endpoint.
+Explain how to:
+
+
+-Authenticate
+
+
+-Format requests
+
+
+-Handle responses
+
+
+-Deal with common errors
+
+
+-Include example code in Python
+
+
+Target audience: beginner developers
+Tone: friendly and simple
+
+**AI Response from Prompt 3**
+
+Developer Usage Guide
+
+How to Use the Registration API
+This API helps users create a new account.
+Since registration happens before login, no authentication token is needed.
+
+Step 1: Format the Request
+Send a POST request to:
+/api/users/register
+Use JSON in the request body.
+Example:
+{  "username": "newuser",  "email": "newuser@gmail.com",  "password": "mypassword123"}
+
+Step 2: Python Example
+import requestsurl = "http://localhost:5000/api/users/register"data = {    "username": "newuser",    "email": "newuser@gmail.com",    "password": "mypassword123"}response = requests.post(url, json=data)print(response.status_code)print(response.json())
+
+Step 3: Handle Responses
+
+Success
+If registration is successful:
+201 Created
+
+Common Errors
+400
+Bad input like invalid email or weak password
+
+409
+Username or email already exists
+
+500
+Internal server/database problem
+
+**Final Combined Documentation Version**
+
+My Understanding
+From my understanding, this endpoint is responsible for creating new users safely.
+At first, I thought it only saved user details, but after using the prompts, I understood that it also handles:
+
+
+-security through password hashing
+
+
+-validation before saving
+
+
+-preventing duplicate accounts
+
+
+-confirmation email sending
+
+
+-proper error responses
+
+
+This showed me that API endpoints are not just about saving data—they also protect the system and improve user experience.
+
+**Reflection**
+
+The most challenging part for the AI was explaining why some validation steps happen before database creation. For example, checking duplicate usernames before creating the user helps prevent unnecessary work and avoids database issues.
+
+I also noticed that if I only pasted part of the code, the AI explanation became weaker. The best results came when I included the full endpoint logic and explained what I already understood first.
+
+I found the Markdown format easier to understand as a beginner, while OpenAPI looked more professional and useful for teams. This approach would help a lot in real projects because many APIs are poorly documented, and AI can help junior developers understand them faster.

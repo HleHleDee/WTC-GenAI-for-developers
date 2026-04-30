@@ -1,0 +1,371 @@
+# Using AI Prompt to Understand the Algorithm
+
+**Prompt Used (Deciphering Complex Functions and Algorithms)**
+
+I’m trying to understand how this Task Priority Sorting Algorithm works in our Python codebase.
+
+This feature seems to handle sorting tasks based on importance using multiple conditions instead of only priority labels.
+
+Here are the key functions involved:
+
+calculate_task_score(task) – calculates a score for each task
+sort_tasks_by_importance(tasks) – sorts tasks using the calculated score
+get_top_priority_tasks(tasks) – returns only the top important tasks
+
+Here is the code snippet:
+
+def calculate_task_score(task):
+    priority_weights = {
+        TaskPriority.LOW: 1,
+        TaskPriority.MEDIUM: 2,
+        TaskPriority.HIGH: 4,
+        TaskPriority.URGENT: 6
+    }
+
+    score = priority_weights.get(task.priority, 0) * 10
+
+    if task.due_date:
+        days_until_due = (task.due_date - datetime.now()).days
+        if days_until_due < 0:
+            score += 35
+        elif days_until_due == 0:
+            score += 20
+        elif days_until_due <= 2:
+            score += 15
+        elif days_until_due <= 7:
+            score += 10
+
+    if task.status == TaskStatus.DONE:
+        score -= 50
+    elif task.status == TaskStatus.REVIEW:
+        score -= 15
+
+    if any(tag in ["blocker", "critical", "urgent"] for tag in task.tags):
+        score += 8
+
+    days_since_update = (datetime.now() - task.updated_at).days
+    if days_since_update < 1:
+        score += 5
+
+    return score
+   
+   Could you:
+
+-Explain in simple terms what this algorithm does
+-Walk me through the execution flow
+-Explain why certain score values are added or       subtracted
+-Identify important business logic decisions
+-Give me a mental model for understanding this algorithm
+
+Also suggest a small challenge to test my understanding.
+
+**My Understanding After AI Explanation**
+
+After using the prompt, I understood that this algorithm works like a decision-making system for ranking tasks.
+
+Instead of saying:
+
+“URGENT tasks always come first”
+
+the system asks:
+
+“How important is this task right now?”
+
+and then gives it a score.
+
+The higher the score, the higher the task appears in the list.
+
+This makes the system smarter because even a medium-priority task can become more important if:
+
+it is overdue
+it is due today
+it blocks other work
+it was recently updated
+
+At the same time, completed tasks should not stay at the top, so their score is reduced.
+
+
+Step-by-Step Breakdown of the Algorithm
+Step 1: Base Priority Score
+
+The algorithm starts by checking the task priority.
+
+LOW = 1
+MEDIUM = 2
+HIGH = 4
+URGENT = 6
+
+Then it multiplies the value by 10.
+
+Example:
+
+LOW → 10
+MEDIUM → 20
+HIGH → 40
+URGENT → 60
+
+This creates the starting score.
+
+Why?
+
+Because priority should be the main factor.
+
+Urgent tasks should naturally start with a higher score than low-priority tasks.
+
+Step 2: Due Date Factor
+
+The system checks how close the due date is.
+
+Rules:
+overdue → +35
+due today → +20
+due within 2 days → +15
+due within 7 days → +10
+Example:
+
+A HIGH priority task due tomorrow:
+
+40 + 15 = 55
+
+Why?
+
+Because deadlines increase urgency.
+
+Even a medium-priority task due today may be more important than a high-priority task due next month.
+
+Step 3: Reduce Score for Completed Tasks
+if task.status == DONE:
+    score -= 50
+Rules:
+DONE → -50
+REVIEW → -15
+Why?
+
+Completed tasks should move down the list.
+
+Review tasks are still active but less urgent than incomplete tasks.
+
+This prevents finished work from staying at the top.
+
+Step 4: Special Tags Bonus
+["blocker", "critical", "urgent"]
+
+If the task contains one of these tags:
+
+score += 8
+Why?
+
+Some tasks are blockers for other work.
+
+Example:
+
+If deployment is blocked by one bug, fixing that bug becomes more important.
+
+This helps reflect real business impact.
+
+Step 5: Recently Updated Bonus
+if days_since_update < 1:
+    score += 5
+
+Why?
+
+Recently updated tasks are usually active and currently being worked on. The system boosts them slightly so they stay visible.
+
+Step 6: Sorting
+
+After every task gets a score:
+
+sort_tasks_by_importance(tasks)
+
+sorts from:
+
+highest → lowest
+
+This creates the final priority list.
+
+Step 7: Top Priority Tasks
+get_top_priority_tasks(tasks, limit=5)
+
+returns only the top tasks.
+
+Usually:
+
+Top 5 most important tasks
+
+This helps users focus only on the most urgent work.
+
+**Simple Visual Flow**
+
+Task
+ ↓
+Check Priority
+ ↓
+Check Due Date
+ ↓
+Check Status
+ ↓
+Check Tags
+ ↓
+Check Recent Updates
+ ↓
+Final Score
+ ↓
+Sort All Tasks
+ ↓
+Show Top Priority Tasks
+
+
+**Example Calculation**
+Task Example:
+Priority: HIGH
+Due tomorrow
+Status: TODO
+Tag: blocker
+Updated today
+Score Calculation:
+
+Base Priority:
+
+40
+
+Due Tomorrow:
+
++15
+
+Blocker Tag:
+
++8
+
+Recently Updated:
+
++5
+
+Final Score:
+
+68
+
+This task would appear very high on the task list.
+
+Important Business Logic Discovered
+
+The most important insight is:
+
+Priority alone does not decide importance
+
+The system uses business context
+
+This is smarter because:
+
+deadlines matter
+blocked work matters
+completed work should move down
+
+This reflects how real teams actually work.
+
+**Small Challenge to Test Understanding**
+
+If a task has:
+
+Priority = MEDIUM
+Due date = overdue
+Status = REVIEW
+Tag = critical
+Updated today
+
+Question:
+
+What would the final score be?
+
+My Answer:
+
+Base:
+
+20
+
+Overdue:
+
++35
+
+Review:
+
+-15
+
+Critical Tag:
+
++8
+
+Recently Updated:
+
++5
+
+Final Score:
+
+53
+
+This helped confirm that I fully understood the scoring logic.
+
+**Reflection Questions**
+How did the AI explanation change your understanding?
+
+At first, I thought the algorithm was only sorting by priority labels like LOW, HIGH, and URGENT.
+
+After the explanation, I understood that it is actually a weighted scoring system that combines several business factors.
+
+This made me see that the algorithm is much smarter and more practical than simple sorting.
+
+
+What aspects were still difficult to understand?
+
+The exact reason behind specific values like:
+
+why overdue = +35
+why DONE = -50
+
+These values seem like business decisions rather than technical rules.
+
+I would ask the team whether these values were chosen through testing or simply based on experience.
+
+
+How would you explain this to another junior developer?
+
+I would say:
+
+“This algorithm acts like a manager deciding which task deserves attention first. It gives points for urgency and removes points for completed work. Then it sorts tasks by total score.”
+
+That explanation makes it much easier to understand.
+
+Did you test this understanding against AI?
+
+Yes.
+
+I manually calculated scores for example tasks and checked if my logic matched the algorithm.
+
+This helped verify my understanding.
+
+
+How might you improve the algorithm?
+
+
+Possible improvements:
+
+allow users to customize scoring values
+include team deadlines
+include task dependencies
+boost tasks assigned by managers
+reduce score for very old inactive tasks
+
+This would make prioritization even more realistic.
+
+**Final Learning Points**
+
+This exercise taught me that understanding algorithms is not just about reading code.
+
+It is about understanding:
+
+why decisions were made
+what business problem the code solves
+how the logic affects users
+
+Using AI prompts made the process much faster and clearer.
+
+Instead of being overwhelmed by the code, I could break the algorithm into understandable steps and build confidence in my understanding.

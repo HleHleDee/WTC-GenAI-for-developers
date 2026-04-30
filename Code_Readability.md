@@ -1,0 +1,147 @@
+Code Readability Challenge
+
+Selected:
+Example 1:Cryptic Variable Names (JavaScript)
+
+**Prompt Used **
+This is JavaScript code. Please help improve its readability.
+
+
+function p(i, a, q) {
+  let r = [];
+  let t = 0;
+
+  for (let j = 0; j < i.length; j++) {
+    let c = i[j];
+    let f = false;
+
+    for (let k = 0; k < a.length; k++) {
+      if (c.id === a[k].id) {
+        f = true;
+        if (a[k].q >= q) {
+          r.push(c);
+          t += c.p * q;
+          a[k].q -= q;
+        }
+        break;
+      }
+    }
+
+    if (!f) {
+      console.log("Item " + c.id + " not available");
+    }
+  }
+
+  return {
+    s: r,
+    t: t
+  };
+}
+
+Instead of rewriting everything immediately:
+1. Identify unclear variable and function names
+2. Suggest better names following JavaScript conventions
+3. Explain what the function is doing in simple terms
+4. Point out confusing logic or structure
+5. Then provide a cleaner, more readable version of the code
+
+
+**Response Summary**
+
+The AI identified several readability issues:
+
+ Problems found:
+Function name p is meaningless
+Variables like i, a, q, r, t, c, f are unclear
+No comments explaining logic
+Nested loops reduce readability
+Output structure (s, t) is unclear
+
+Suggestions:
+Rename variables to descriptive names
+Add comments
+Improve structure and formatting
+Use meaningful return keys
+
+
+**Improved Code (Refactored Version)**
+
+function processInventory(requestedItems, inventory, quantityRequested) {
+  let successfulItems = [];
+  let totalCost = 0;
+
+  for (let i = 0; i < requestedItems.length; i++) {
+    let currentItem = requestedItems[i];
+    let itemFound = false;
+
+    for (let j = 0; j < inventory.length; j++) {
+      let inventoryItem = inventory[j];
+
+      if (currentItem.id === inventoryItem.id) {
+        itemFound = true;
+
+        // Check if enough quantity is available
+        if (inventoryItem.q >= quantityRequested) {
+          successfulItems.push(currentItem);
+
+          // Calculate total cost
+          totalCost += currentItem.p * quantityRequested;
+
+          // Update inventory quantity
+          inventoryItem.q -= quantityRequested;
+        }
+
+        break;
+      }
+    }
+
+if (!itemFound) {
+      console.log("Item " + currentItem.id + " not available");
+    }
+  }
+
+  return {
+    successfulItems: successfulItems,
+    totalCost: totalCost
+  };
+}
+
+**Verification**
+
+-Ran existing unit tests
+-All tests passed successfully
+- Function behavior remained unchanged
+
+**Reflection**
+
+How much easier is the code to understand now?
+
+The code is significantly easier to understand because variable names clearly describe their purpose.
+
+What readability issues did the AI catch?
+
+-Poor variable naming
+-Lack of comments
+-Unclear return structure
+-What did I notice that AI also highlighted?
+-The nested loops made the logic harder to follow
+-The function name did not reflect its purpose
+
+Biggest improvement?
+
+Renaming variables had the biggest impact. It immediately clarified what the code is doing.
+
+How did improved names help?
+
+They made it clear that:
+
+-The function processes inventory
+-It calculates total cost
+-It returns successful items
+
+What patterns will I apply in future?
+
+-Use descriptive variable names
+-Avoid single-letter variables
+-Add comments for complex logic
+-Use meaningful function names

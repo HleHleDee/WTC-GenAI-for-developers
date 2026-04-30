@@ -1,0 +1,253 @@
+# Code Documentation
+
+Selected Algorithm: Task Priority Sorting Algorithm (Python)
+
+I am choosing the Python Task Priority Sorting Algorithm, specifically the calculate_task_score(task) function, because it has enough business logic and is a good example of undocumented code that needs clear explanation.
+
+This function determines how important a task is by assigning it a score based on:
+
+task priority
+due date proximity
+completion status
+task tags
+recent updates
+
+This helps the system decide which tasks should appear first.
+
+**Original Code Chosen**
+
+def calculate_task_score(task):
+    """Calculate a priority score for a task based on multiple factors."""
+    # Base priority weights
+    priority_weights = {
+        TaskPriority.LOW: 1,
+        TaskPriority.MEDIUM: 2,
+        TaskPriority.HIGH: 4,
+        TaskPriority.URGENT: 6
+    }
+
+    # Calculate base score from priority
+    score = priority_weights.get(task.priority, 0) * 10
+
+    # Add due date factor (higher score for tasks due sooner)
+    if task.due_date:
+        days_until_due = (task.due_date - datetime.now()).days
+        if days_until_due < 0:
+            score += 35
+        elif days_until_due == 0:
+            score += 20
+        elif days_until_due <= 2:
+            score += 15
+        elif days_until_due <= 7:
+            score += 10
+
+    # Reduce score for completed or review tasks
+    if task.status == TaskStatus.DONE:
+        score -= 50
+    elif task.status == TaskStatus.REVIEW:
+        score -= 15
+
+    # Boost score for important tags
+    if any(tag in ["blocker", "critical", "urgent"] for tag in task.tags):
+        score += 8
+
+ Boost score for recently updated tasks
+    days_since_update = (datetime.now() - task.updated_at).days
+    if days_since_update < 1:
+        score += 5
+
+    return score
+
+**Prompt 1 Used**
+
+Comprehensive Function Documentation Prompt
+
+Please create comprehensive documentation for this function following Python docstring conventions:
+
+[pasted function code]
+
+The documentation should include:
+
+A clear description of what the function does
+All parameters with types and descriptions
+Return value with type and description
+Any exceptions or errors that might be thrown
+Example usage
+Any important notes or edge cases developers should be aware of
+
+**AI Response from Prompt 1**
+
+Generated Documentation
+
+def calculate_task_score(task):
+    """
+    Calculate an importance score for a task based on multiple business rules.
+
+    The score helps determine task priority by considering:
+    - Base task priority level
+    - How close the due date is
+    - Whether the task is overdue
+    - Task completion or review status
+    - Presence of important tags
+    - How recently the task was updated
+
+    Higher scores indicate more important tasks.
+
+    Args:
+        task (Task):
+            The task object to evaluate. Expected to contain:
+            - priority (TaskPriority)
+            - due_date (datetime or None)
+            - status (TaskStatus)
+            - tags (list[str])
+            - updated_at (datetime)
+
+    Returns:
+        int:
+            Final calculated score representing task importance.
+
+    Raises:
+        AttributeError:
+            If required task attributes are missing.
+
+        TypeError:
+            If task fields contain invalid data types.
+
+    Example:
+        task = Task("Finish report")
+        task.priority = TaskPriority.HIGH
+        score = calculate_task_score(task)
+        print(score)
+
+   Notes:
+- Completed tasks receive a large score      reduction
+- Overdue tasks receive a significant score    increase
+- Tasks tagged as blocker, critical, or urgent are boosted
+- Recently updated tasks are slightly prioritized
+    """
+
+**Prompt 2 Used**
+Intent and Logic Explanation Prompt
+
+I need help documenting the intent and logic behind this code. Please:
+
+[pasted function code]
+Explain what this code is trying to accomplish at a high level
+Break down the logic step-by-step
+Identify assumptions or edge cases
+Suggest inline comments for complex parts
+Note any potential improvements while maintaining original functionality
+
+**AI Response from Prompt 2**
+Insights and Logic Explanation
+
+From my understanding, this function is trying to help the task manager decide which tasks are most important and should be shown first.
+
+Instead of only checking task priority like LOW or HIGH, it combines several factors to make a smarter decision.
+
+Step-by-step Logic
+Step 1: Start with Base Priority
+
+Each task priority has a weight:
+
+LOW = 1
+MEDIUM = 2
+HIGH = 4
+URGENT = 6
+
+This is multiplied by 10 to create the starting score.
+
+This means urgent tasks naturally start with a higher score.
+
+Step 2: Check Due Date
+
+If the task has a due date:
+
+overdue tasks get +35
+due today gets +20
+due within 2 days gets +15
+due within 7 days gets +10
+
+This makes urgent deadlines more important.
+
+Step 3: Reduce Score for Completed Work
+
+If the task is already:
+
+DONE → subtract 50
+REVIEW → subtract 15
+
+This prevents completed tasks from appearing at the top.
+
+Step 4: Check Important Tags
+
+If the task contains tags like:
+
+blocker
+critical
+urgent
+
+it receives +8 points.
+
+This helps important flagged
+
+
+Step 5: Recently Updated Tasks
+
+If the task was updated recently (less than 1 day):
+
++5 points are added.
+
+This helps active work stay visible.
+
+**Final Combined Documentation Version**
+
+def calculate_task_score(task):
+"""
+Calculate the importance score of a task using multiple business rules.
+
+This function helps the Task Manager decide which tasks should be treated
+as the highest priority by assigning a score to each task.
+
+The score is based on:
+- task priority level
+- due date urgency
+- task completion status
+- important tags
+- recent activity
+
+Higher scores mean the task is more important.
+
+Args:
+task (Task):
+A task object containing:
+priority (TaskPriority),
+due_date (datetime),
+status (TaskStatus),
+tags (list),
+updated_at (datetime)
+
+Returns:
+int:
+A numerical score representing task importance.
+
+Example:
+task = Task("Submit project")
+task.priority = TaskPriority.HIGH
+score = calculate_task_score(task)
+
+Notes:
+- overdue tasks get major score increases
+- completed tasks get strong score reductions
+- important tags improve visibility
+- recently updated tasks get small boosts
+"""
+
+
+
+**Reflection**
+
+The most challenging part for the AI was correctly explaining the business reason  the scoring values like +35 or -50.
+The AI could explain what the code does technically, but I had to think more about why the developer chose those specific values.
+I also noticed that giving full code context helped a lot. If I only pasted small pieces, the explanation became weaker.
+This approach would be very useful in real projects because many codebases have functions with little or no documentation. Using AI helps speed up understanding, especially for junior developers like me who are still learning how to read business logic inside code.

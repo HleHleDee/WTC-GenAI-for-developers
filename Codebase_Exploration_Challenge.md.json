@@ -1,0 +1,126 @@
+# Understanding Task Creation and Status Updates
+**My Initial Understanding (Before AI)**
+
+At the beginning, I assumed that task creation and task updates would mainly happen inside the CLI file because that is where the user interacts with the system using commands like create, list, and update-status.
+
+I also thought that when a task is created, it is just stored directly without much structure, and when the status changes, it is simply overwritten.
+
+However, I was not fully sure how the system handles task data behind the scenes or how different files work together.
+
+**Files I Identified as Important**
+
+From exploring the codebase, I identified these key files:
+
+cli.py → handles user commands and input
+task_manager.py → contains the main business logic for tasks
+models.py → defines Task, TaskStatus, and TaskPriority
+storage.py → likely responsible for saving and loading tasks
+
+This already showed me that the system is split into different responsibilities instead of everything being in one file.
+
+**Code Snippets I Examined**
+From cli.py (status display logic)
+status_symbol = {
+    TaskStatus.TODO: "[ ]",
+    TaskStatus.IN_PROGRESS: "[>]",
+    TaskStatus.REVIEW: "[?]",
+    TaskStatus.DONE: "[✓]"
+}
+
+priority_symbol = {
+    TaskPriority.LOW: "!",
+    TaskPriority.MEDIUM: "!!",
+    TaskPriority.HIGH: "!!!",
+    TaskPriority.URGENT: "!!!!"
+}
+
+This helped me understand that CLI is mainly responsible for displaying task information in a user-friendly way, not handling business logic.
+
+From task_manager.py (task creation logic)
+def create_task(self, title, description="", priority_value=2,
+               due_date_str=None, tags=None):
+    priority = TaskPriority(priority_value)
+    due_date = None
+    if due_date_str:
+        try:
+            due_date = datetime.strptime(due_date_str, "%Y-%m-%d")
+        except ValueError:
+            print("Invalid date format. Use YYYY-MM-DD")
+            return None
+
+This showed me that:
+
+Task creation is handled inside TaskManager, not CLI
+Priority is converted into a structured enum (TaskPriority)
+Due dates are validated before being accepted
+There is error handling for incorrect input formats
+
+**What I Discovered About Task Creation Flow**
+
+After reviewing the code and using AI, I now understand the flow like this:
+
+Step 1: User Input (CLI)
+
+The user runs a command like creating a task.
+
+Step 2: CLI receives input
+
+cli.py collects the arguments and passes them to TaskManager.
+
+Step 3: Business Logic (TaskManager)
+
+task_manager.py processes the data:
+
+validates priority
+parses due date
+prepares task data
+Step 4: Task is created
+
+A Task object is created using structured models.
+
+Step 5: Storage
+
+The task is saved using TaskStorage.
+
+**Understanding Status Updates**
+
+From the CLI symbols, I learned that:
+
+Status is not just text, it is an enum (TaskStatus)
+Each status has meaning in the system:
+TODO → not started
+IN_PROGRESS → currently working
+REVIEW → needs checking
+DONE → completed
+
+Even though CLI shows symbols, the real logic behind status changes is handled in the backend (TaskManager and model classes).
+
+**What I Initially Got Wrong**
+
+At first, I thought:
+
+CLI handles everything
+Task creation is just simple data storage
+Status updates are just visual changes
+
+But now I understand:
+
+*CLI only receives commands and displays output
+*TaskManager handles actual logic
+*Models define structure and rules
+*Storage handles persistence
+
+**Key Insight**
+
+The most important thing I learned is that this project follows a separation of concerns design:
+
+CLI → user interaction
+TaskManager → business logic
+Models → structure and rules
+Storage → data saving
+
+This makes the system easier to maintain and extend.
+
+**My Final Understanding**
+
+Task creation and status updates are not simple actions in this system. They go through multiple layers, each with a specific responsibility. This helped me understand how real-world applications are structured instead of everything being in one place.
