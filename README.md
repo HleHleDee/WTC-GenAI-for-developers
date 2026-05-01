@@ -1,4 +1,4 @@
-# WTC GenAI for Developers
+# WTC GenAI for Software Engineers
 
 This repository contains my exercises from the WeThinkCode_ GenAI for Developers curriculum.
 
