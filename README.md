@@ -1,6 +1,6 @@
 # WTC GenAI for Software Engineers
 
-This repository contains my exercises from the WeThinkCode_ GenAI for Developers curriculum.
+This repository contains my exercises from the WeThinkCode_ GenAI for Software Engineers curriculum.
 
 The main focus of this work is learning how to use AI as a tool to support software development, not just for coding but also for understanding, analysing, and improving code.
 
